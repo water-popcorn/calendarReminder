@@ -253,17 +253,18 @@ async function createCalendarEvents() {
   parseStage.value = '正在写入系统日历…'; parseProgress.value = 55
   let created = 0
   const failed = []
+  const failedMessages = []
   for (const event of selectedEvents.value) {
     try {
       const mapping = await createEvent(event, { calendarId: settings.calendarId || 'default', requestId: `req_${Date.now()}` })
       event.calendarMapping = mapping; event.status = 'CREATED'; created += 1
-    } catch (error) { event.status = 'FAILED'; failed.push(event.title) }
+    } catch (error) { event.status = 'FAILED'; failed.push(event.title); failedMessages.push(error?.message || '日历写入失败') }
   }
   const item = makeHistoryItem(created ? 'CREATED' : 'FAILED')
   item.eventCount = selectedEvents.value.length; item.createdCount = created; item.failedCount = failed.length
   history.value.unshift(item); enqueue({ entityType: 'request', entityId: item.id, payload: item }); outbox.value = storage.read(STORAGE_KEYS.outbox, []) || []
   createdCount.value = created; persist(); parseProgress.value = 100
-  if (failed.length) showToast(`${created} 个已创建，${failed.length} 个失败可重试`)
+  if (failed.length) showToast(created ? `${created} 个已创建，${failed.length} 个失败可重试` : (failedMessages[0] || '日历写入失败，请检查目标日历'))
   sheet.value = created ? 'success' : 'confirm'
 }
 function finishCreate() { sheet.value = ''; activeTab.value = 'home' }
