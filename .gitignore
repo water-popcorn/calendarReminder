@@ -1,0 +1,21 @@
+# Python virtual environment and generated caches
+server/.venv/
+server/__pycache__/
+server/**/*.pyc
+__pycache__/
+
+# Frontend generated output and dependencies
+node_modules/
+dist/
+.vite/
+
+# Local secrets and runtime logs
+.env
+.env.*
+*.log
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
